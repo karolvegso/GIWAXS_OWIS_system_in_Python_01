@@ -41,9 +41,9 @@ from PyQt6.QtWidgets import (
 )
 
 # COM port of the OWIS controller for the vertical Z stage
-COM_PORT_Z_MOTOR = 5
+COM_PORT_Z_MOTOR = 7
 # COM port of the OWIS controller for the tilt stage
-COM_PORT_TILT_MOTOR = 3
+COM_PORT_TILT_MOTOR = 4
 
 class ImageCanvas(FigureCanvasQTAgg):
     """A matplotlib canvas that shows a single 2D image with a colorbar."""
@@ -177,10 +177,10 @@ class Tab1(QWidget):
         self.take_button = QPushButton("Take single image")
         self.take_button.clicked.connect(self.take_single_image)
 
-        self.x_min = self._make_spinbox(0)
-        self.x_max = self._make_spinbox(1028)
-        self.y_min = self._make_spinbox(0)
-        self.y_max = self._make_spinbox(512)
+        self.x_min = self._make_spinbox(478)
+        self.x_max = self._make_spinbox(490)
+        self.y_min = self._make_spinbox(491)
+        self.y_max = self._make_spinbox(504)
 
         roi_form = QFormLayout()
         roi_form.addRow("x-min (pixel):", self.x_min)
@@ -254,19 +254,19 @@ class Tab1(QWidget):
         # congigure Eiger detector
         dict_data = {'value':1}
         data_json = json.dumps(dict_data)
-        r = requests.put('http://10.10.10.31/detector/api/1.8.0/config/nimages', data_json)
+        r = requests.put('http://10.10.10.11/detector/api/1.8.0/config/nimages', data_json)
         print(r.status_code)
         dict_data = {'value':self.count_time1.value()}
         data_json = json.dumps(dict_data)
-        r = requests.put('http://10.10.10.31/detector/api/1.8.0/config/count_time', data_json)
+        r = requests.put('http://10.10.10.11/detector/api/1.8.0/config/count_time', data_json)
         print(r.status_code)
         dict_data = {'value':self.frame_time1.value()}
         data_json = json.dumps(dict_data)
-        r = requests.put('http://10.10.10.31/detector/api/1.8.0/config/frame_time', data_json)
+        r = requests.put('http://10.10.10.11/detector/api/1.8.0/config/frame_time', data_json)
         print(r.status_code)
         dict_data = {'value':8400}
         data_json = json.dumps(dict_data)
-        r = requests.put('http://10.10.10.31/detector/api/1.8.0/config/photon_energy', data_json)
+        r = requests.put('http://10.10.10.11/detector/api/1.8.0/config/photon_energy', data_json)
         print(r.status_code)
         # Print the http status code (NOTE: Only http code 200 is OK, everything else is an error)
         print("Configuration of acquition - passed")
@@ -274,15 +274,15 @@ class Tab1(QWidget):
         # Configure monitor mode
         dict_data = {'value':1000}
         data_json = json.dumps(dict_data)
-        r = requests.put('http://10.10.10.31/monitor/api/1.8.0/config/buffer_size', data_json)
+        r = requests.put('http://10.10.10.11/monitor/api/1.8.0/config/buffer_size', data_json)
         print(r.status_code)
         dict_data = {'value':True}
         data_json = json.dumps(dict_data)
-        r = requests.put('http://10.10.10.31/monitor/api/1.8.0/config/discard_new', data_json)
+        r = requests.put('http://10.10.10.11/monitor/api/1.8.0/config/discard_new', data_json)
         print(r.status_code)
         dict_data = {'value':"enabled"}
         data_json = json.dumps(dict_data)
-        r = requests.put('http://10.10.10.31/monitor/api/1.8.0/config/mode', data_json)
+        r = requests.put('http://10.10.10.11/monitor/api/1.8.0/config/mode', data_json)
         print(r.status_code)
 
         print("Configuration of monitor - passed")
@@ -297,18 +297,18 @@ class Tab1(QWidget):
         # Z stop pixel
         Z_stop_pixel=self.y_max.value()
         
-        r = requests.put('http://10.10.10.31/detector/api/1.8.0/command/arm')
+        r = requests.put('http://10.10.10.11/detector/api/1.8.0/command/arm')
         print(r.status_code)
         #print("Arming")
 
-        r = requests.put('http://10.10.10.31/detector/api/1.8.0/command/trigger')
+        r = requests.put('http://10.10.10.11/detector/api/1.8.0/command/trigger')
         print(r.status_code)
         print("Acquition started")
         print("Checking buffer ?")
 
         # wait after end of trigger 0.5 second
         time.sleep(0.5)
-        r = requests.get('http://10.10.10.31:80/monitor/api/1.8.0/images/monitor')
+        r = requests.get('http://10.10.10.11:80/monitor/api/1.8.0/images/monitor')
         # convert r content to stream of bytes and read stream of bytes as image
         img = Image.open(BytesIO(r.content))
         # convert image to numpy array
@@ -512,7 +512,7 @@ class Tab2(QWidget):
 
             # load library
             # give location of dll
-            mydll = windll.LoadLibrary(r"d:\programs_work\Python\Owis_motor_Z_scan\ps10.dll")
+            mydll = windll.LoadLibrary(r"C:\Python_Karol\GIWAXS_project_01\ps10u.dll")
 
             # open virtual serial interface (or serial interface via tcp/ip socket)
             if nComPort_Owis_motor==0: # find first connected control unit
@@ -563,19 +563,19 @@ class Tab2(QWidget):
                 # congigure Eiger detector
                 dict_data = {'value':1}
                 data_json = json.dumps(dict_data)
-                r = requests.put('http://10.10.10.31/detector/api/1.8.0/config/nimages', data_json)
+                r = requests.put('http://10.10.10.11/detector/api/1.8.0/config/nimages', data_json)
                 print(r.status_code)
                 dict_data = {'value':self.count_time2.value()}
                 data_json = json.dumps(dict_data)
-                r = requests.put('http://10.10.10.31/detector/api/1.8.0/config/count_time', data_json)
+                r = requests.put('http://10.10.10.11/detector/api/1.8.0/config/count_time', data_json)
                 print(r.status_code)
                 dict_data = {'value':self.frame_time2.value()}
                 data_json = json.dumps(dict_data)
-                r = requests.put('http://10.10.10.31/detector/api/1.8.0/config/frame_time', data_json)
+                r = requests.put('http://10.10.10.11/detector/api/1.8.0/config/frame_time', data_json)
                 print(r.status_code)
                 dict_data = {'value':8400}
                 data_json = json.dumps(dict_data)
-                r = requests.put('http://10.10.10.31/detector/api/1.8.0/config/photon_energy', data_json)
+                r = requests.put('http://10.10.10.11/detector/api/1.8.0/config/photon_energy', data_json)
                 print(r.status_code)
                 # Print the http status code (NOTE: Only http code 200 is OK, everything else is an error)
                 print("Configuration of acquition - passed")
@@ -583,15 +583,15 @@ class Tab2(QWidget):
                 # Configure monitor mode
                 dict_data = {'value':1000}
                 data_json = json.dumps(dict_data)
-                r = requests.put('http://10.10.10.31/monitor/api/1.8.0/config/buffer_size', data_json)
+                r = requests.put('http://10.10.10.11/monitor/api/1.8.0/config/buffer_size', data_json)
                 print(r.status_code)
                 dict_data = {'value':True}
                 data_json = json.dumps(dict_data)
-                r = requests.put('http://10.10.10.31/monitor/api/1.8.0/config/discard_new', data_json)
+                r = requests.put('http://10.10.10.11/monitor/api/1.8.0/config/discard_new', data_json)
                 print(r.status_code)
                 dict_data = {'value':"enabled"}
                 data_json = json.dumps(dict_data)
-                r = requests.put('http://10.10.10.31/monitor/api/1.8.0/config/mode', data_json)
+                r = requests.put('http://10.10.10.11/monitor/api/1.8.0/config/mode', data_json)
                 print(r.status_code)
 
                 print("Configuration of monitor - passed")
@@ -606,18 +606,18 @@ class Tab2(QWidget):
                 # Z stop pixel
                 Z_stop_pixel=self.tab1.y_max.value()
                 
-                r = requests.put('http://10.10.10.31/detector/api/1.8.0/command/arm')
+                r = requests.put('http://10.10.10.11/detector/api/1.8.0/command/arm')
                 print(r.status_code)
                 #print("Arming")
 
-                r = requests.put('http://10.10.10.31/detector/api/1.8.0/command/trigger')
+                r = requests.put('http://10.10.10.11/detector/api/1.8.0/command/trigger')
                 print(r.status_code)
                 print("Acquition started")
                 print("Checking buffer ?")
 
                 # wait after end of trigger 0.5 second
                 time.sleep(0.5)
-                r = requests.get('http://10.10.10.31:80/monitor/api/1.8.0/images/monitor')
+                r = requests.get('http://10.10.10.11:80/monitor/api/1.8.0/images/monitor')
                 # convert r content to stream of bytes and read stream of bytes as image
                 img = Image.open(BytesIO(r.content))
                 # convert image to numpy array
@@ -696,7 +696,7 @@ class Tab2(QWidget):
 
         # load library
         # give location of dll
-        mydll = windll.LoadLibrary(r"d:\programs_work\Python\Owis_motor_Z_scan\ps10.dll")
+        mydll = windll.LoadLibrary(r"C:\Python_Karol\GIWAXS_project_01\ps10u.dll")
 
         # open virtual serial interface (or serial interface via tcp/ip socket)
         if nComPort_Owis_motor==0: # find first connected control unit
@@ -901,7 +901,7 @@ class Tab3(QWidget):
 
             # load library
             # give location of dll
-            mydll = windll.LoadLibrary(r"d:\programs_work\Python\Owis_motor_Z_scan\ps10.dll")
+            mydll = windll.LoadLibrary(r"C:\Python_Karol\GIWAXS_project_01\ps10.dll")
 
             # open virtual serial interface (or serial interface via tcp/ip socket)
             if nComPort_Owis_motor==0: # find first connected control unit
@@ -952,19 +952,19 @@ class Tab3(QWidget):
                 # congigure Eiger detector
                 dict_data = {'value':1}
                 data_json = json.dumps(dict_data)
-                r = requests.put('http://10.10.10.31/detector/api/1.8.0/config/nimages', data_json)
+                r = requests.put('http://10.10.10.11/detector/api/1.8.0/config/nimages', data_json)
                 print(r.status_code)
                 dict_data = {'value':self.count_time3.value()}
                 data_json = json.dumps(dict_data)
-                r = requests.put('http://10.10.10.31/detector/api/1.8.0/config/count_time', data_json)
+                r = requests.put('http://10.10.10.11/detector/api/1.8.0/config/count_time', data_json)
                 print(r.status_code)
                 dict_data = {'value':self.frame_time3.value()}
                 data_json = json.dumps(dict_data)
-                r = requests.put('http://10.10.10.31/detector/api/1.8.0/config/frame_time', data_json)
+                r = requests.put('http://10.10.10.11/detector/api/1.8.0/config/frame_time', data_json)
                 print(r.status_code)
                 dict_data = {'value':8400}
                 data_json = json.dumps(dict_data)
-                r = requests.put('http://10.10.10.31/detector/api/1.8.0/config/photon_energy', data_json)
+                r = requests.put('http://10.10.10.11/detector/api/1.8.0/config/photon_energy', data_json)
                 print(r.status_code)
                 # Print the http status code (NOTE: Only http code 200 is OK, everything else is an error)
                 print("Configuration of acquition - passed")
@@ -972,15 +972,15 @@ class Tab3(QWidget):
                 # Configure monitor mode
                 dict_data = {'value':1000}
                 data_json = json.dumps(dict_data)
-                r = requests.put('http://10.10.10.31/monitor/api/1.8.0/config/buffer_size', data_json)
+                r = requests.put('http://10.10.10.11/monitor/api/1.8.0/config/buffer_size', data_json)
                 print(r.status_code)
                 dict_data = {'value':True}
                 data_json = json.dumps(dict_data)
-                r = requests.put('http://10.10.10.31/monitor/api/1.8.0/config/discard_new', data_json)
+                r = requests.put('http://10.10.10.11/monitor/api/1.8.0/config/discard_new', data_json)
                 print(r.status_code)
                 dict_data = {'value':"enabled"}
                 data_json = json.dumps(dict_data)
-                r = requests.put('http://10.10.10.31/monitor/api/1.8.0/config/mode', data_json)
+                r = requests.put('http://10.10.10.11/monitor/api/1.8.0/config/mode', data_json)
                 print(r.status_code)
 
                 print("Configuration of monitor - passed")
@@ -995,18 +995,18 @@ class Tab3(QWidget):
                 # Z stop pixel
                 Z_stop_pixel=self.tab1.y_max.value()
                 
-                r = requests.put('http://10.10.10.31/detector/api/1.8.0/command/arm')
+                r = requests.put('http://10.10.10.11/detector/api/1.8.0/command/arm')
                 print(r.status_code)
                 #print("Arming")
 
-                r = requests.put('http://10.10.10.31/detector/api/1.8.0/command/trigger')
+                r = requests.put('http://10.10.10.11/detector/api/1.8.0/command/trigger')
                 print(r.status_code)
                 print("Acquition started")
                 print("Checking buffer ?")
 
                 # wait after end of trigger 0.5 second
                 time.sleep(0.5)
-                r = requests.get('http://10.10.10.31:80/monitor/api/1.8.0/images/monitor')
+                r = requests.get('http://10.10.10.11:80/monitor/api/1.8.0/images/monitor')
                 # convert r content to stream of bytes and read stream of bytes as image
                 img = Image.open(BytesIO(r.content))
                 # convert image to numpy array
@@ -1075,7 +1075,7 @@ class Tab3(QWidget):
 
         # load library
         # give location of dll
-        mydll = windll.LoadLibrary(r"d:\programs_work\Python\Owis_motor_Z_scan\ps10.dll")
+        mydll = windll.LoadLibrary(r"C:\Python_Karol\GIWAXS_project_01\ps10.dll")
 
         # open virtual serial interface (or serial interface via tcp/ip socket)
         if nComPort_Owis_motor==0: # find first connected control unit
@@ -1218,7 +1218,7 @@ class Tab4(QWidget):
 
         # load library
         # give location of dll
-        mydll = windll.LoadLibrary(r"d:\programs_work\Python\Owis_motor_Z_scan\ps10.dll")
+        mydll = windll.LoadLibrary(r"C:\Python_Karol\GIWAXS_project_01\ps10u.dll")
 
         # open virtual serial interface (or serial interface via tcp/ip socket)
         if nComPort_Owis_motor==0: # find first connected control unit
@@ -1298,7 +1298,7 @@ class Tab4(QWidget):
 
         # load library
         # give location of dll
-        mydll = windll.LoadLibrary(r"d:\programs_work\Python\Owis_motor_Z_scan\ps10.dll")
+        mydll = windll.LoadLibrary(r"C:\Python_Karol\GIWAXS_project_01\ps10u.dll")
 
         # open virtual serial interface (or serial interface via tcp/ip socket)
         if nComPort_Owis_motor==0: # find first connected control unit
@@ -1378,7 +1378,7 @@ class Tab4(QWidget):
 
         # load library
         # give location of dll
-        mydll = windll.LoadLibrary(r"d:\programs_work\Python\Owis_motor_Z_scan\ps10.dll")
+        mydll = windll.LoadLibrary(r"C:\Python_Karol\GIWAXS_project_01\ps10u.dll")
 
         # open virtual serial interface (or serial interface via tcp/ip socket)
         if nComPort_Owis_motor==0: # find first connected control unit
@@ -1450,7 +1450,7 @@ class Tab4(QWidget):
 
         # load library
         # give location of dll
-        mydll = windll.LoadLibrary(r"d:\programs_work\Python\Owis_motor_Z_scan\ps10.dll")
+        mydll = windll.LoadLibrary(r"C:\Python_Karol\GIWAXS_project_01\ps10u.dll")
 
         # open virtual serial interface (or serial interface via tcp/ip socket)
         if nComPort_Owis_motor==0: # find first connected control unit
@@ -1568,7 +1568,7 @@ class Tab5(QWidget):
 
         # load library
         # give location of dll
-        mydll = windll.LoadLibrary(r"d:\programs_work\Python\Owis_motor_Z_scan\ps10.dll")
+        mydll = windll.LoadLibrary(r"C:\Python_Karol\GIWAXS_project_01\ps10.dll")
 
         # open virtual serial interface (or serial interface via tcp/ip socket)
         if nComPort_Owis_motor==0: # find first connected control unit
@@ -1648,7 +1648,7 @@ class Tab5(QWidget):
 
         # load library
         # give location of dll
-        mydll = windll.LoadLibrary(r"d:\programs_work\Python\Owis_motor_Z_scan\ps10.dll")
+        mydll = windll.LoadLibrary(r"C:\Python_Karol\GIWAXS_project_01\ps10.dll")
 
         # open virtual serial interface (or serial interface via tcp/ip socket)
         if nComPort_Owis_motor==0: # find first connected control unit
@@ -1728,7 +1728,7 @@ class Tab5(QWidget):
 
         # load library
         # give location of dll
-        mydll = windll.LoadLibrary(r"d:\programs_work\Python\Owis_motor_Z_scan\ps10.dll")
+        mydll = windll.LoadLibrary(r"C:\Python_Karol\GIWAXS_project_01\ps10.dll")
 
         # open virtual serial interface (or serial interface via tcp/ip socket)
         if nComPort_Owis_motor==0: # find first connected control unit
@@ -1800,7 +1800,7 @@ class Tab5(QWidget):
 
         # load library
         # give location of dll
-        mydll = windll.LoadLibrary(r"d:\programs_work\Python\Owis_motor_Z_scan\ps10.dll")
+        mydll = windll.LoadLibrary(r"C:\Python_Karol\GIWAXS_project_01\ps10.dll")
 
         # open virtual serial interface (or serial interface via tcp/ip socket)
         if nComPort_Owis_motor==0: # find first connected control unit
